@@ -5,6 +5,7 @@
 require('dotenv').config();
 var express = require('express');
 var app = express();
+var http = require('http');
 
 // enable CORS (https://en.wikipedia.org/wiki/Cross-origin_resource_sharing)
 // so that your API is remotely testable by FCC
@@ -22,6 +23,23 @@ app.get('/', function (req, res) {
 // your first API endpoint...
 app.get('/api/hello', function (req, res) {
   res.json({ greeting: 'hello API' });
+});
+
+app.get('/api/whoami', function (req, res) {
+  const language = req.headers['accept-language'];
+  const userAgent = req.headers['user-agent'];
+
+  // From https://www.ipify.org/
+  const options = {'host': 'api.ipify.org', 'port': 80, 'path': '/'};
+  http.get(options, function(resp) {
+    resp.on('data', function(ip) {
+      res.json({ 
+        ipaddress: ip.toString(),
+        language: language,
+        software: userAgent,
+      });
+    });
+  });
 });
 
 // listen for requests :)
